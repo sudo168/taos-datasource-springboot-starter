@@ -76,7 +76,7 @@
 spring.datasource.taos:
     jdbc-url: jdbc:TAOS://127.0.0.1:0/you_database?user=root&password=taosdata&enableMicrosecond=true
     use-http: false # 默认false, 不使用http JDBC
-    mac-force-http: true # 默认true, 会自动检查系统环境，发现是Mac是直接使用http JDBC
+    mac-force-http: true # 默认true, 会自动检查系统环境，发现是Mac时直接使用http JDBC
     mapper-locations: # 与mybatis的mapperLocations配置作用一致，两者用其一即可
         - classpath*:sqlmap/*-mapper.xml
 ```
