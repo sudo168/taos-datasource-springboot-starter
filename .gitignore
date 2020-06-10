@@ -1,0 +1,11 @@
+target/
+.mvn/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+# dumps #
+dumps/state_*
