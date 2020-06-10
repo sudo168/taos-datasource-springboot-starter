@@ -9,12 +9,15 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 public class TaosConnectionPool extends TaosPool<TaosConnection>{
 
+    private TaosPool2ConfigProperties poolConfig;
+
     public TaosConnectionPool(TaosConfigProperties configProperties, TaosPool2ConfigProperties pool2ConfigProperties) {
         this(pool2ConfigProperties, new TaosConnectionFactory(configProperties, pool2ConfigProperties));
     }
 
-    public TaosConnectionPool(GenericObjectPoolConfig poolConfig, PooledObjectFactory<TaosConnection> factory) {
+    private TaosConnectionPool(GenericObjectPoolConfig poolConfig, PooledObjectFactory<TaosConnection> factory) {
         super(poolConfig, factory);
+        this.poolConfig = (TaosPool2ConfigProperties) poolConfig;
     }
 
     @Override
@@ -24,6 +27,10 @@ public class TaosConnectionPool extends TaosPool<TaosConnection>{
             resource.setDataSource(this);
         }
         return resource;
+    }
+
+    public String getTestQuery(){
+        return  poolConfig.getTestQuery();
     }
 
     @Override

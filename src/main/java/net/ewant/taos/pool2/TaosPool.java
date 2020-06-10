@@ -95,6 +95,20 @@ public abstract class TaosPool<T> implements Closeable {
         }
     }
 
+    public int getMaxTotal() {
+        if (poolInactive()) {
+            return -1;
+        }
+        return this.internalPool.getMaxTotal();
+    }
+
+    public int getMinIdle() {
+        if (poolInactive()) {
+            return -1;
+        }
+        return this.internalPool.getMinIdle();
+    }
+
     /**
      * Returns the number of instances currently borrowed from this pool.
      *

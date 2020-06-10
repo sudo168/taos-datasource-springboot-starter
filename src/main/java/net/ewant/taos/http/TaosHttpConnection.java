@@ -104,7 +104,7 @@ public class TaosHttpConnection implements Connection {
     }
 
     private String appendDatabase(String sql, StringBuffer tableBuffer, StringBuffer columnBuffer){
-        if(sql == TaosConfigProperties.DEFAULT_TEST_QUERY){
+        if(TaosConfigProperties.DEFAULT_TEST_QUERY.equalsIgnoreCase(sql)){
             return sql;
         }
         Matcher matcher = SELECT_PATTERN.matcher(sql);
@@ -117,7 +117,11 @@ public class TaosHttpConnection implements Connection {
             String newSql = buffer.toString();
             Matcher tableMatcher = SELECT_TABLE_PATTERN.matcher(newSql);
             if(tableMatcher.find()){
-                tableBuffer.append(tableMatcher.group(2));
+                String t = tableMatcher.group(2);
+                if(t.contains(".")){
+                    return sql;
+                }
+                tableBuffer.append(t);
             }
             Matcher columnMatcher = COLUMN_PATTERN.matcher(newSql);
             if(columnMatcher.find()){
@@ -133,7 +137,11 @@ public class TaosHttpConnection implements Connection {
         if(buffer.length() > 0){
             Matcher tableMatcher = INSERT_TABLE_PATTERN.matcher(buffer.toString());
             if(tableMatcher.find()){
-                tableBuffer.append(tableMatcher.group(2));
+                String t = tableMatcher.group(2);
+                if(t.contains(".")){
+                    return sql;
+                }
+                tableBuffer.append(t);
             }
             return buffer.toString();
         }

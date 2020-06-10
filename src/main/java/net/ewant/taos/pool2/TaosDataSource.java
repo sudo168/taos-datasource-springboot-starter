@@ -68,4 +68,8 @@ public class TaosDataSource implements DataSource {
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
     }
+
+    public TaosConnectionPool getPool() {
+        return connectionPool;
+    }
 }

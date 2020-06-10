@@ -99,6 +99,18 @@ public class TaosHttpResultSet implements ResultSet {
                 columnMetaData = currentMetaList;
             }
             resultSetMetaData = new TSDBResultSetMetaData(columnMetaData);
+        }else{
+            // For test query
+            if(httpResult.ok() && httpResult.getRows() > 0 && httpResult.getHead().length == 1){
+                List<ColumnMetaData> columnMetaData = new ArrayList<>();
+                ColumnMetaData metaData = new ColumnMetaData();
+                metaData.setColType(TSDBConstants.TSDB_DATA_TYPE_INT);
+                metaData.setColSize(4);
+                metaData.setColName(httpResult.getHead()[0]);
+                metaData.setColIndex(1);
+                columnMetaData.add(metaData);
+                resultSetMetaData = new TSDBResultSetMetaData(columnMetaData);
+            }
         }
     }
 
@@ -305,7 +317,7 @@ public class TaosHttpResultSet implements ResultSet {
         return parseTimestamp(timeStr);
     }
 
-    static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private Timestamp parseTimestamp(String timeStr){
         try {
             String s = timeStr.split("\\.")[1];

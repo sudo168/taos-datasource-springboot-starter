@@ -7,6 +7,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import net.ewant.taos.TaosJDBCLoader;
 import net.ewant.taos.http.TaosHttpDriver;
 import net.ewant.taos.pool2.TaosDataSource;
+import net.ewant.taos.support.poolmetadata.TaosDataSourcePoolMetadata;
+import net.ewant.taos.support.poolmetadata.TaosDruidDataSourcePoolMetadata;
+import net.ewant.taos.support.poolmetadata.TaosHikariDataSourcePoolMetadata;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -27,6 +30,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadataProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -110,7 +114,20 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
         @Bean
         @ConditionalOnMissingBean(name = "taosDataSource")
         public TaosDataSource taosDataSource(TaosPool2ConfigProperties properties) throws Exception {
+            if(properties.getTestQuery() == null){
+                properties.setTestQuery(TaosConfigProperties.DEFAULT_TEST_QUERY);
+            }
             return new TaosDataSource(configProperties, properties);
+        }
+
+        @Bean
+        public DataSourcePoolMetadataProvider taosDataSourcePoolMetadataProvider(TaosDataSource taosDataSource){
+            return (dataSource -> {
+                if(dataSource != taosDataSource){
+                    return null;
+                }
+                return new TaosDataSourcePoolMetadata((TaosDataSource) dataSource);
+            });
         }
     }
 
@@ -135,6 +152,16 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
                 properties.setPassword(configProperties.getPassword());
             }
             return new HikariDataSource(properties);
+        }
+
+        @Bean
+        public DataSourcePoolMetadataProvider taosDataSourcePoolMetadataProvider(HikariDataSource taosDataSource){
+            return (dataSource -> {
+                if(dataSource != taosDataSource){
+                    return null;
+                }
+                return new TaosHikariDataSourcePoolMetadata((HikariDataSource) dataSource);
+            });
         }
     }
 
@@ -162,6 +189,16 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
                 properties.put(DruidDataSourceFactory.PROP_VALIDATIONQUERY, TaosConfigProperties.DEFAULT_TEST_QUERY);
             }
             return (DruidDataSource) DruidDataSourceFactory.createDataSource(properties);
+        }
+
+        @Bean
+        public DataSourcePoolMetadataProvider taosDataSourcePoolMetadataProvider(DruidDataSource taosDataSource){
+            return (dataSource -> {
+                if(dataSource != taosDataSource){
+                    return null;
+                }
+                return new TaosDruidDataSourcePoolMetadata((DruidDataSource) dataSource);
+            });
         }
     }
 

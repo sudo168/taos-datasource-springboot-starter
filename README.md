@@ -14,6 +14,8 @@
 
 6. springboot应用中直接配置使用，方便快捷
 
+7. 支持springboot JDBC actuator（DataSourceHealthIndicator）进行连接池的健康检查
+
 ###【配置使用】：
 
 #### Maven 依赖：
