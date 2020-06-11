@@ -1,6 +1,7 @@
 package net.ewant.taos.http;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taosdata.jdbc.ColumnMetaData;
 import com.taosdata.jdbc.TSDBConstants;
 import com.taosdata.jdbc.TSDBResultSetMetaData;
@@ -10,8 +11,8 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -22,6 +23,7 @@ public class TaosHttpResultSet implements ResultSet {
 
     static final Pattern COLUMN_PATTERN = Pattern.compile("\\((.*)\\)", Pattern.CASE_INSENSITIVE);
     static final Pattern COUNT_PATTERN = Pattern.compile("count\\((.*)\\)", Pattern.CASE_INSENSITIVE);
+    static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     static final Map<String, List<ColumnMetaData>> TABLE_METADATA_MAP = new HashMap<>();
 
@@ -38,7 +40,11 @@ public class TaosHttpResultSet implements ResultSet {
     public TaosHttpResultSet(TaosHttpConnection connector, String table, String[] columns, String result) throws SQLException {
         this.connector = connector;
         if(result != null){
-            this.httpResult = JSON.parseObject(result, TaosHttpResult.class);
+            try {
+                this.httpResult = JSON_MAPPER.readValue(result, TaosHttpResult.class);
+            } catch (JsonProcessingException e) {
+                throw new SQLException(e);
+            }
         }else{
             this.httpResult = new TaosHttpResult();
         }
