@@ -38,9 +38,9 @@
 <dependency>
     <groupId>net.ewent.taos</groupId>
     <artifactId>taos-datasource-springboot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <scope>system</scope>
-    <systemPath>${basedir}/src/main/lib/taos-datasource-springboot-starter-1.0.0.jar</systemPath>
+    <systemPath>${basedir}/src/main/lib/taos-datasource-springboot-starter-1.0.0-SNAPSHOT.jar</systemPath>
 </dependency>
 
 <!--mybatis-->
