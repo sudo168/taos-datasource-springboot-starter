@@ -117,11 +117,7 @@ public class TaosHttpConnection implements Connection {
             String newSql = buffer.toString();
             Matcher tableMatcher = SELECT_TABLE_PATTERN.matcher(newSql);
             if(tableMatcher.find()){
-                String t = tableMatcher.group(2);
-                if(t.contains(".")){
-                    return sql;
-                }
-                tableBuffer.append(t);
+                tableBuffer.append(tableMatcher.group(2));
             }
             Matcher columnMatcher = COLUMN_PATTERN.matcher(newSql);
             if(columnMatcher.find()){
@@ -137,11 +133,7 @@ public class TaosHttpConnection implements Connection {
         if(buffer.length() > 0){
             Matcher tableMatcher = INSERT_TABLE_PATTERN.matcher(buffer.toString());
             if(tableMatcher.find()){
-                String t = tableMatcher.group(2);
-                if(t.contains(".")){
-                    return sql;
-                }
-                tableBuffer.append(t);
+                tableBuffer.append(tableMatcher.group(2));
             }
             return buffer.toString();
         }
