@@ -71,7 +71,7 @@ public class TaosHttpConnection implements Connection {
         String host = uri.getHost();
         int port = uri.getPort();
         if(port < 1){
-            port = 6020;
+            port = 6041;
         }
         this.httpClient = new HttpClient("http://" + host + ":" + port + "/rest/sql");
     }

@@ -2,7 +2,7 @@
 
 ###【功能】：
 
-1. 内置驱动包（v1.6.5.9 x64）, 客户端无需手动安装驱动包
+1. 内置驱动包（x64）, 客户端无需手动安装驱动包
 
 2. 支持Http，为方便 Mac 端开发，实现了Http JDBC调用
 
@@ -31,7 +31,7 @@
 <dependency>
     <groupId>com.taosdata.jdbc</groupId>
     <artifactId>taos-jdbcdriver</artifactId>
-    <version>1.0.3</version>
+    <version>2.0.2</version>
 </dependency>
 
 <!--taos-datasource依赖放到工程目录-->

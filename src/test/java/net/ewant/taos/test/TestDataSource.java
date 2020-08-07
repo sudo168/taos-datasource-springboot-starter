@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import net.ewant.taos.pool2.TaosDataSource;
 import net.ewant.taos.support.TaosConfigProperties;
+import net.ewant.taos.support.TaosDataSourceAutoConfiguration;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -18,7 +19,7 @@ public class TestDataSource {
     static int tablesCount = 1;
 
     public static void main(String[] args) throws Exception {
-        String url = "jdbc:TAOS://192.168.2.43:0/atom_index?user=root&password=taosdata";
+        String url = "jdbc:TAOS://192.168.2.44:0/"+databaseName+"?user=root&password=taosdata";
         DataSource dataSource = getTaosDataSource(url);
         //DataSource dataSource = getHikariDataSource(url);
         //DataSource dataSource = getDruidDataSource(url);
@@ -49,6 +50,7 @@ public class TestDataSource {
     private static DataSource getTaosDataSource(String url){
         TaosConfigProperties configProperties = new TaosConfigProperties();
         configProperties.setJdbcUrl(url);
+        new TaosDataSourceAutoConfiguration(configProperties);// apply useHttp
         return new TaosDataSource(configProperties, null);
     }
     private static DataSource getDruidDataSource(String url) throws Exception {
