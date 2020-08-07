@@ -143,5 +143,5 @@ public class OrderServiceImpl implements OrderService {
 windows 下可以将 C:\TDengine\driver\taos.dll 拷贝到 C:\Windows\System32\ 目录下。
 linux   下将建立如下软链 ln -s /usr/local/taos/driver/libtaos.so.x.x.x.x /usr/lib/libtaos.so 即可。
 
-更多内容请查看taos官方文档：https://www.taosdata.com/cn/documentation/connector/
+更多内容请查看taos官方文档：https://www.taosdata.com/cn/documentation20/connector/
     
