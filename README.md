@@ -31,7 +31,7 @@
 <dependency>
     <groupId>com.taosdata.jdbc</groupId>
     <artifactId>taos-jdbcdriver</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 
 <!--taos-datasource依赖放到工程目录-->
