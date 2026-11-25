@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadataProvider;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Configuration
+@Conditional(TaosDataSourceConfiguredCondition.class)
 @EnableConfigurationProperties(TaosConfigProperties.class)
 public class TaosDataSourceAutoConfiguration implements InitializingBean {
 
@@ -61,16 +63,6 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
 
     private boolean currentUseHttp;
     private TaosConfigProperties configProperties;
-
-    static{
-        try {
-            TaosJDBCLoader.initialize();
-            Class.forName("com.taosdata.jdbc.TSDBDriver");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(9);
-        }
-    }
 
     static void useHttpDriver(){
         try {
@@ -95,6 +87,7 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
             currentUseHttp = true;
             logger.info("TAOS DataSource use HTTP Driver...");
         }else if("Mac".equals(TaosJDBCLoader.OSInfo.getOSName()) && configProperties.isMacForceHttp()){
+            configProperties.setUseHttp(true);
             useHttpDriver();
             currentUseHttp = true;
             logger.info("TAOS DataSource use HTTP Driver for Mac...");
@@ -106,6 +99,13 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
     }
 
+    private void initializeNativeDriver() throws Exception {
+        if (!currentUseHttp) {
+            TaosJDBCLoader.initialize();
+            Class.forName(TSDBDriver.class.getName());
+        }
+    }
+
     @ConditionalOnClass(ObjectPool.class)
     @ConditionalOnProperty(value = "spring.datasource.taos.pool2")
     @EnableConfigurationProperties(TaosPool2ConfigProperties.class)
@@ -114,6 +114,7 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
         @Bean
         @ConditionalOnMissingBean(name = "taosDataSource")
         public TaosDataSource taosDataSource(TaosPool2ConfigProperties properties) throws Exception {
+            initializeNativeDriver();
             if(properties.getTestQuery() == null){
                 properties.setTestQuery(TaosConfigProperties.DEFAULT_TEST_QUERY);
             }
@@ -138,6 +139,7 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
         @Bean
         @ConditionalOnMissingBean(name = "taosDataSource")
         public HikariDataSource taosDataSource(TaosHikariConfigProperties properties) throws Exception {
+            initializeNativeDriver();
             properties.setDriverClassName(currentUseHttp ? TaosHttpDriver.class.getName() : TSDBDriver.class.getName());
             if(properties.getConnectionTestQuery() == null){
                 properties.setConnectionTestQuery(TaosConfigProperties.DEFAULT_TEST_QUERY);
@@ -172,6 +174,7 @@ public class TaosDataSourceAutoConfiguration implements InitializingBean {
         @Bean
         @ConditionalOnMissingBean(name = "taosDataSource")
         public DruidDataSource taosDataSource(TaosDruidConfigProperties properties) throws Exception {
+            initializeNativeDriver();
             properties.put(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, currentUseHttp ? TaosHttpDriver.class.getName() : TSDBDriver.class.getName());
             if(properties.getProperty(DruidDataSourceFactory.PROP_URL) == null){
                 properties.put(DruidDataSourceFactory.PROP_URL, configProperties.getJdbcUrl());

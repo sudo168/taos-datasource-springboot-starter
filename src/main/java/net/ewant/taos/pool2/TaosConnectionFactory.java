@@ -1,6 +1,7 @@
 package net.ewant.taos.pool2;
 
 import net.ewant.taos.TaosConnection;
+import net.ewant.taos.TaosJDBCLoader;
 import net.ewant.taos.exception.TaosConnectionException;
 import net.ewant.taos.support.TaosConfigProperties;
 import net.ewant.taos.support.TaosPool2ConfigProperties;
@@ -24,6 +25,10 @@ public class TaosConnectionFactory implements PooledObjectFactory<TaosConnection
     public PooledObject<TaosConnection> makeObject() throws Exception {
         // Creates an instance that can be served by the pool
         try {
+            if (!configProperties.isUseHttp()) {
+                TaosJDBCLoader.initialize();
+                Class.forName("com.taosdata.jdbc.TSDBDriver");
+            }
             Connection realConnect = DriverManager.getConnection(configProperties.getJdbcUrl(), configProperties.getProperties());
             return new DefaultPooledObject(new TaosConnection(realConnect));
         } catch (Exception e) {

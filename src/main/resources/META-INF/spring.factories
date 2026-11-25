@@ -1,3 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+net.ewant.iotdb.support.IoTdbDataSourceAutoConfiguration,\
 net.ewant.taos.support.TaosDataSourceAutoConfiguration

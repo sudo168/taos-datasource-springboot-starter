@@ -144,4 +144,38 @@ windows 下可以将 C:\TDengine\driver\taos.dll 拷贝到 C:\Windows\System32\ 
 linux   下将建立如下软链 ln -s /usr/local/taos/driver/libtaos.so.x.x.x.x /usr/lib/libtaos.so 即可。
 
 更多内容请查看taos官方文档：https://www.taosdata.com/cn/documentation20/connector/
-    
+
+### Apache IoTDB JDBC
+
+此 starter 同时提供 Apache IoTDB 2.0.x JDBC 支持，默认使用 `iotdb-jdbc` 2.0.11。配置 `spring.datasource.iotdb.url` 后会自动创建名为 `iotdbDataSource` 的轻量 `DataSource`；未配置 IoTDB URL 时不会创建该 Bean。
+
+```yaml
+spring:
+  datasource:
+    iotdb:
+      url: jdbc:iotdb://127.0.0.1:6667/
+      username: ${IOTDB_USERNAME}
+      password: ${IOTDB_PASSWORD}
+      # 可选：IoTDB JDBC driver properties，按所用驱动版本填写
+      properties: {}
+```
+
+使用标准 JDBC API 获取连接，并在调用方关闭连接、语句和结果集：
+
+```java
+@Autowired
+@Qualifier("iotdbDataSource")
+private DataSource iotdbDataSource;
+
+public void query() throws SQLException {
+    try (Connection connection = iotdbDataSource.getConnection();
+         Statement statement = connection.createStatement();
+         ResultSet results = statement.executeQuery("SELECT * FROM root.example.device LIMIT 100")) {
+        while (results.next()) {
+            // 按列或标签读取当前行
+        }
+    }
+}
+```
+
+该 `DataSource` 不持有连接，也不内置连接池。生产应用可用 HikariCP、Druid 等连接池包装 `iotdbDataSource`，并由应用关闭连接池。`DataSource.setLoginTimeout` 遵循 JDBC `DriverManager` 的 JVM 级全局超时设置；如应用有多个 JDBC 驱动，应避免在运行期间从不同数据源反复修改该值。IoTDB 凭据建议通过环境变量或密钥管理服务注入，额外 `properties` 会原样传给 IoTDB JDBC 驱动。
